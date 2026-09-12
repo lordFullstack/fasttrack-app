@@ -23,6 +23,19 @@ console.log(`[boot] Node ${process.version}`);
 console.log(`[boot] PORT=${PORT}`);
 console.log(`[boot] DATABASE_URL target: ${maskedUrl(DATABASE_URL)}`);
 
+// Diagnostic only, never logs the actual password — just its length and
+// whether it has leading/trailing whitespace, which copy-paste sometimes
+// introduces invisibly.
+try {
+  const parsed = new URL(DATABASE_URL);
+  const rawPassword = decodeURIComponent(parsed.password);
+  console.log(`[boot] password length: ${rawPassword.length}`);
+  console.log(`[boot] password has leading/trailing whitespace: ${rawPassword !== rawPassword.trim()}`);
+  console.log(`[boot] username: "${parsed.username}"`);
+} catch (e) {
+  console.log(`[boot] could not parse password for diagnostics: ${e}`);
+}
+
 const isLocalDb = /localhost|127\.0\.0\.1/.test(DATABASE_URL);
 const pool = new Pool({
   connectionString: DATABASE_URL,
